@@ -3,7 +3,6 @@ var request = require('request');
 var spotify = require('node-spotify-api');
 var twitter = require ('twitter');
 var keys = require('./keys.js');
-var client = new twitter(keys.consumerKey);
 
 //Holds Argument's array
 var fs = require('fs');
