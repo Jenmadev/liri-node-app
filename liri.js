@@ -9,7 +9,14 @@ var client = new twitter({
 	tokenKey:keys.twitterKeys.tokenKey,
 	tokenSecret:keys.twitterKeys.tokenSecret
 });
+var spotify = new spotify({
+	id: keys.spotifyKeys.id,
+ 	secret: keys.spotifyKeys.secret
+});
 
+var omdb = new omdb({
+	id: keys.omdbKeys.id
+});
 //Holds Argument's array
 var fs = require('fs');
 var args = process.argv;
