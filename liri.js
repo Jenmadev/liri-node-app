@@ -3,7 +3,12 @@ var request = require('request');
 var spotify = require('node-spotify-api');
 var twitter = require ('twitter');
 var keys = require('./keys.js');
-var client = new twitter(keys.twitterKeys);
+var client = new twitter({
+	consumerKey: keys.twitterKeys.consumerKey,
+	consumerSecret:keys.twitterKeys.consumerSecret,
+	tokenKey:keys.twitterKeys.tokenKey,
+	tokenSecret:keys.twitterKeys.tokenSecret
+});
 
 //Holds Argument's array
 var fs = require('fs');
@@ -63,11 +68,11 @@ function myTweets(){
   		if (!error) {
   			for (var i = 0; i < tweets.length; i++){
   				var latest = tweets[i].created_at;
-  				console.log("@MaKnowsThat:" + tweet[i].text + "Created At: " + date.substring(0, 19));
+  				console.log("@MaKnowsThat:" + tweets[i].text + "Created At: " + date.substring(0, 19));
   				console.log('---------------');
 
   		// Log The Results
-		  		fs.appendFile('log.txt',"@MaKnowsThat:" + tweet[i].text + "Created At: " + date.substring(0, 19));
+		  		fs.appendFile('log.txt',"@MaKnowsThat:" + tweets[i].text + "Created At: " + date.substring(0, 19));
 		  		fs.appendFile('log.txt','---------------');
   			}
   		}	
