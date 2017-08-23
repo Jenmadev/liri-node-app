@@ -4,36 +4,45 @@ var spotify = require('node-spotify-api');
 var twitter = require ('twitter');
 var keys = require('./keys.js');
 var client = new twitter({
-	consumerKey: keys.twitterKeys.consumerKey,
-	consumerSecret:keys.twitterKeys.consumerSecret,
-	tokenKey:keys.twitterKeys.tokenKey,
-	tokenSecret:keys.twitterKeys.tokenSecret
+	consumer_key: keys.twitterKeys.consumerKey,
+	consumer_secret:keys.twitterKeys.consumerSecret,
+	access_token_key:keys.twitterKeys.tokenKey,
+	access_token_secret:keys.twitterKeys.tokenSecret
 });
+// console.log(keys.twitterKeys.consumerKey);
+// console.log(keys.twitterKeys.consumerSecret);
+// console.log(keys.twitterKeys.tokenKey);
+// console.log(keys.twitterKeys.tokenSecret);
 var spotify = new spotify({
 	id: keys.spotifyKeys.id,
  	secret: keys.spotifyKeys.secret
 });
 
-var omdb = new omdb({
-	id: keys.omdbKeys.id
-});
+// console.log(keys.spotifyKeys.id);
+// console.log(keys.spotifyKeys.secret);
+
+
+// var omdb = new omdb({
+// 	id: keys.omdbKeys.id
+// });
 //Holds Argument's array
 var fs = require('fs');
 var args = process.argv;
 var command = process.argv[2];
+var song = process.argv[3];
 
 //Movie/Song
 var topic = "";
 
-for (var i = 2; i < args.length; i++){
-	if (i > 2 && i < args.length){
+for (var i = 3; i < args.length; i++){
+	if (i > 3 && i < args.length){
 		topic = topic + "+" + args[i];
 	}
 	else{
 		topic = topic + args[i];
 	}
 };
-
+// console.log("SONG: "+ topic);
 
 //switch case
 switch(command){
@@ -46,7 +55,7 @@ switch(command){
 			searchSpotify(topic);
 		}
 		else {
-			searchSpotify("Born to Make You Happy");
+			searchSpotify("The Sign");
 		}
 	break;
 
@@ -70,27 +79,30 @@ switch(command){
 
 function myTweets(){
 	//Show latest tweets limit 20 
-	var params = {screen_name: 'maknowsthat'};
+	var params = {screen_name: 'MaKnowsThat'};
 	client.get('statuses/user_timeline', params, function(error, tweets, response) {
+  		console.log(response);
+  		console.log(tweets);
   		if (!error) {
   			for (var i = 0; i < tweets.length; i++){
   				var latest = tweets[i].created_at;
-  				console.log("@MaKnowsThat:" + tweets[i].text + "Created At: " + date.substring(0, 19));
+  				console.log("@MaKnowsThat: " + tweets[i].text + "Created At: " + latest.substring(0, 19));
   				console.log('---------------');
 
   		// Log The Results
-		  		fs.appendFile('log.txt',"@MaKnowsThat:" + tweets[i].text + "Created At: " + date.substring(0, 19));
+		  		fs.appendFile('log.txt',"@MaKnowsThat:" + tweets[i].text + "Created At: " + latest.substring(0, 19));
 		  		fs.appendFile('log.txt','---------------');
   			}
   		}	
 		else{
-		  	console.log('Error');
+		  	console.log('Error from Twitter' + error);
   		}
 	});
 }
 
-function searchSpotify(){
-	spotify.search({ type: 'track', query: song }, function(error, data) {
+function searchSpotify(topic){
+	
+	spotify.search({ type: 'track', query: topic}, function(error, data) {
   		if (!error) {
   			for (var i = 0;  i < data.tracks.items.length; i++){
   				var songInfo = data.tracks.items[i];
@@ -107,21 +119,21 @@ function searchSpotify(){
   		// Log The Results
 		  		fs.appendFile('log.txt',songInfo.artists[0].name);
 		  		fs.appendFile('log.txt',songInfo.name);
-		  		fs.appendFile('log.txt',ssongInfo.preview_url);
+		  		fs.appendFile('log.txt',songInfo.preview_url);
 		  		fs.appendFile('log.txt',songInfo.album.name);
 		  		fs.appendFile('log.txt','---------------');
 	}
     		
   		}
   		else{
-  			console.log('Error');
+  			console.log('Error From Spotify');
   		}		
 });
 
 }
 
-function omdbInfo(movie){
-  var omdbURL = 'http://www.omdbapi.com/?t=' + movie + '&plot=short&tomatoes=true';
+function omdbInfo(topic){
+  var omdbURL = 'http://www.omdbapi.com/?apikey='+ keys.omdbKeys.id +'&t=' + topic + '&plot=short&tomatoes=true';
 
   request(omdbURL, function (error, response, body){
     if(!error && response.statusCode == 200){
@@ -134,6 +146,8 @@ function omdbInfo(movie){
       console.log("Language: " + body.Language);
       console.log("Plot: " + body.Plot);
       console.log("Actors: " + body.Actors);
+      console.log("Rotten Tomatoes: " + body.tomatoRating);
+      console.log("Rotten Tomatoes URL: " + body.tomatoURL);
 
       // Log The Results
       fs.appendFile('log.txt', "Title: " + body.Title);
@@ -149,7 +163,7 @@ function omdbInfo(movie){
     } else{
       console.log('Error occurred.')
     }
-    if(movie === "Mr. Nobody"){
+    if(topic === "Mr. Nobody"){
       console.log("-----------------------");
       console.log("If you haven't watched 'Mr. Nobody,' then you should: http://www.imdb.com/title/tt0485947/");
       console.log("It's on Netflix!");
